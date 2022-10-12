@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.PayWingsOAuthAndroidSDKSampleApp.Starting" parent="Theme.SplashScreen">
+        // Set the splash screen background, animated icon, and animation duration.
+        <item name="windowSplashScreenBackground">?android:colorBackground</item>
+
+        // Use windowSplashScreenAnimatedIcon to add either a drawable or an
+        // animated drawable. One of these is required.
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo</item>
+
+        // Set the theme of the Activity that directly follows your splash screen.
+        <item name="postSplashScreenTheme">@style/Theme.PayWingsOAuthAndroidSDKSampleApp</item>  # Required.
+    </style>
+
+
+    <style name="Theme.PayWingsOAuthAndroidSDKSampleApp" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/primaryVariant</item>
+        <item name="android:datePickerDialogTheme">@style/Theme.PayWingsOAuthAndroidSDKSampleApp.Dialog</item>
+        <item name="android:timePickerDialogTheme">@style/Theme.PayWingsOAuthAndroidSDKSampleApp.Dialog</item>
+    </style>
+
+
+    <style name="Theme.PayWingsOAuthAndroidSDKSampleApp.Dialog" parent="android:Theme.Material.Light.Dialog">
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primaryVariant</item>
+        <item name="android:colorAccent">@color/secondary</item>
+    </style>
+
+</resources>

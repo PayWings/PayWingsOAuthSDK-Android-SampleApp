@@ -1,0 +1,96 @@
+<resources>
+    <string name="app_name">PayWings OAuth Android SDK Sample App</string>
+
+    <!--Begin Buttons-->
+    <string name="button_close">Close</string>
+    <string name="button_confirm_code">Confirm code</string>
+    <string name="button_exit">Exit</string>
+    <string name="button_hide_details">Hide details</string>
+    <string name="button_recheck">Recheck</string>
+    <string name="button_register">Register</string>
+    <string name="button_resend_code">Resend code</string>
+    <string name="button_show_details">Show details</string>
+    <string name="button_ok">OK</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="button_verify_email">Verify email</string>
+    <string name="button_confirm_change">Confirm change</string>
+    <string name="button_change_email">Change email</string>
+    <string name="button_sign_out">sign out</string>
+    <!--End Buttons-->
+
+
+    <string name="button_send_confirmation_code">Send confirmation code</string>
+
+    <string name="countdown_timer_days">%1$s Days</string>
+
+    <string name="initialization_screen_progress_message">Initialization&#8230;</string>
+
+
+    <!--Begin ErrorDialog-->
+    <string name="error_dialog_title">An error occurred</string>
+    <string name="error_dialog_description">An unknown error occurred. Please retry at a later time or contact support if the error persists.</string>
+    <!--End ErrorDialog-->
+
+    <!--Begin NoInternetConnectionDialog-->
+    <string name="no_internet_connection_dialog_title">No internet connection</string>
+    <string name="no_internet_connection_dialog_description">We have detected a problem with an internet connection! Please establish an internet connection and retry the action.</string>
+    <!--End NoInternetConnectionDialog-->
+
+    <!--Begin ProcessingDialog-->
+    <string name="progress_dialog_text">Processing transaction&#8230;</string>
+    <!--End ProcessingDialog-->
+
+
+    <!--Begin CountrySelectDialog-->
+    <string name="country_select_dialog_title">Select a country</string>
+    <string name="country_select_dialog_search_label">Search country</string>
+    <string name="country_select_dialog_search_placeholder">Country name</string>
+    <string name="country_select_dialog_search_country_not_found">Country not found!</string>
+    <!--End CountrySelectDialog-->
+
+    <!--Begin SignInRequestOtpScreen-->
+    <string name="sign_in_phone_number_input_screen_title">Phone number verification</string>
+    <string name="sign_in_phone_number_input_screen_description">Please enter your phone number. The ownership of the phone number will be verified via SMS and linked to your wallet.</string>
+    <string name="sign_in_phone_number_input_screen_country_code_label">Country</string>
+    <string name="sign_in_phone_number_input_screen_phone_number_label">Phone number</string>
+    <!--End SignInRequestOtpScreen-->
+
+    <!--Begin SignInOtpVerificationScreen-->
+    <string name="sign_in_phone_number_otp_verification_screen_incorrect_confirmation_code_error">Incorrect confirmation code or valid time expired!</string>
+    <string name="sign_in_phone_number_otp_verification_screen_label">Confirmation code</string>
+    <string name="sign_in_phone_number_otp_verification_screen_title">Enter the %1$s-digit code we sent to</string>
+    <string name="sign_in_request_otp_screen_error_invalid_phone_number">Phone number is not valid!</string>
+    <string name="sign_in_request_otp_screen_error_phone_number_suspended">Phone number is suspended, please contact support!</string>
+    <!--End SignInOtpVerificationScreen-->
+
+    <!--Begin UserRegistrationScreen-->
+    <string name="user_registration_screen_title">Registration</string>
+    <string name="user_registration_screen_first_name">First name</string>
+    <string name="user_registration_screen_last_name">Last name</string>
+    <string name="user_registration_screen_email">Email address</string>
+    <string name="user_registration_screen_error_invalid_email">Email is not a valid email!</string>
+    <!--End UserRegistrationScreen-->
+
+    <!--Begin EmailVerificationRequiredScreen-->
+    <string name="email_verification_required_screen_title">Email verification required</string>
+    <string name="email_verification_required_screen_verification_in_progress_spinner">Email verification in progress&#8230;</string>
+    <string name="email_verification_required_screen_verification_in_progress_description">Please check your email inbox for verification email and confirm it. Note that sending and receiving email can take some time and also sometimes email client marks emails as spam, so keep an eye on your spam inbox. Verification email has been sent to this address: %1$s</string>
+    <string name="email_verification_required_screen_verification_required_subtitle">Your email address needs to be verified before you can proceed.</string>
+    <string name="email_verification_required_screen_verification_required_description">Please check that below email address is correct and then click \"Verify email\" to proceed with verification. If shown email address is incorrect, then click \"Change email\" to change or correct your email address.</string>
+    <string name="email_verification_required_screen_verification_required_email">Email address</string>
+    <!--End EmailVerificationRequiredScreen-->
+
+    <!--Begin ChangeUnverifiedEmailScreen-->
+    <string name="change_unverified_email_screen_title">Verification email change</string>
+    <string name="change_unverified_email_screen_email">New email address</string>
+    <!--End ChangeUnverifiedEmailScreen-->
+
+    <!--Begin MainScreen-->
+    <string name="main_screen_title">Main screen</string>
+    <string name="main_screen_user_id">User Id: %1$s</string>
+    <string name="main_screen_first_name">First name: %1$s</string>
+    <string name="main_screen_last_name">Last name: %1$s</string>
+    <string name="main_screen_email">Email address: %1$s</string>
+    <string name="main_screen_phone_number">Phone number: %1$s</string>
+    <!--End MainScreen-->
+</resources>

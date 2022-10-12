@@ -1,0 +1,24 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url "https://maven.pkg.github.com/paywings/integration/"
+            credentials {
+                username = "PayWings-Integration"
+                password = "@CheckDocumentationForValidToken"
+            }
+        }
+
+    }
+}
+rootProject.name = "PayWings OAuth Android SDK Sample App"
+include ':app'
