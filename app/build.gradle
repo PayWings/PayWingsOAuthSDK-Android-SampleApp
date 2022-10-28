@@ -4,7 +4,6 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'kotlin-parcelize'
-
 }
 
 android {
@@ -15,8 +14,8 @@ android {
         applicationId "com.paywings.oauth.android.sample_app"
         minSdk 25
         targetSdk 33
-        versionCode 1
-        versionName "1.2.0"
+        versionCode 2
+        versionName "1.2.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -92,6 +91,6 @@ dependencies {
 
 
     //PayWings Android SDK
-    implementation 'com.paywings.oauth:android-sdk:1.2.0'
+    implementation 'com.paywings.oauth:android-sdk:1.2.1'
 
 }
