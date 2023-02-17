@@ -91,6 +91,6 @@ dependencies {
 
 
     //PayWings Android SDK
-    implementation 'com.paywings.oauth:android-sdk:1.2.1'
+    implementation 'com.paywings.oauth:android-sdk:1.2.2'
 
 }
