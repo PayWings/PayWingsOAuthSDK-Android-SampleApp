@@ -10,6 +10,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url "/Users/petermernik/Work/Development/MavenLocal/Repo" }
         maven {
             url "https://maven.pkg.github.com/paywings/integration/"
             credentials {
