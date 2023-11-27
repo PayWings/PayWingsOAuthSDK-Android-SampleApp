@@ -93,6 +93,10 @@ class PhoneNumberUtilHelper @Inject constructor(@ApplicationContext val context:
         }
     }
 
+    fun normalizeDigitsOnly(phoneNumber: String?): String? {
+        return phoneNumber?.takeIf { it.isNotBlank() }?.let { phoneNumberString ->  PhoneNumberUtil.normalizeDigitsOnly(phoneNumberString) }
+    }
+
 }
 
 data class CountryPhoneNumberInfo(

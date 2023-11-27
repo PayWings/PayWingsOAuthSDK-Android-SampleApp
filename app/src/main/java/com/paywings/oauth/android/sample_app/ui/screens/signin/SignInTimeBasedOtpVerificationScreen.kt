@@ -8,12 +8,28 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cancel
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -35,7 +51,6 @@ import com.paywings.oauth.android.sample_app.ui.screens.components.ShowErrorText
 import com.paywings.oauth.android.sample_app.ui.screens.dialogs.system.ErrorDialog
 import com.paywings.oauth.android.sample_app.ui.screens.dialogs.system.NoInternetConnectionDialog
 import com.paywings.oauth.android.sample_app.ui.screens.dialogs.system.SystemDialogUiState
-import com.paywings.oauth.android.sample_app.ui.screens.dialogs.system.TooManySMSRequestDialog
 import com.paywings.oauth.android.sample_app.util.consume
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 
@@ -47,78 +62,47 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
  */
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
-object SignInOtpVerificationNav : NavRoute<SignInOtpVerificationViewModel> {
+object SignInTimeBasedOtpVerificationNav : NavRoute<SignInTimeBasedOtpVerificationViewModel> {
 
-    private const val OTP_LENGTH_DATA = "otpLength"
-    private const val PHONE_NUMBER_COUNTRY_CODE= "phoneNumberCountryCode"
-    private const val PHONE_NUMBER = "phoneNumber"
-    private const val PHONE_NUMBER_FORMATTED_DATA = "phoneNumberFormatted"
+    private const val ACCOUNT_NAME = "accountName"
 
+    override val route = "sign_in_time_based_otp_verification_screen"
 
-    override val route = "sign_in_otp_verification_screen"
-
-    fun routeWithArguments(otpLength: Int, phoneNumberCountryCode: String, phoneNumber: String, phoneNumberFormatted: String): String {
-        return "$route/${otpLength}/${Uri.encode(phoneNumberCountryCode)}/${Uri.encode(phoneNumber)}/${Uri.encode(phoneNumberFormatted)}"
+    fun routeWithArguments(accountName: String): String {
+        return "$route/${Uri.encode(accountName)}"
     }
 
     @Composable
-    override fun viewModel(): SignInOtpVerificationViewModel = hiltViewModel()
+    override fun viewModel(): SignInTimeBasedOtpVerificationViewModel = hiltViewModel()
 
     override fun getArguments(): List<NamedNavArgument> {
         return listOf(
-            navArgument(OTP_LENGTH_DATA) {
-                type = NavType.IntType
-            },
-            navArgument(PHONE_NUMBER_COUNTRY_CODE) {
-                type = NavType.StringType
-            },
-            navArgument(PHONE_NUMBER) {
-                type = NavType.StringType
-            },
-            navArgument(PHONE_NUMBER_FORMATTED_DATA) {
+            navArgument(ACCOUNT_NAME) {
                 type = NavType.StringType
             })
     }
 
-    private fun parseOtpLength(arguments: Bundle?): Int {
-        return arguments?.getInt(OTP_LENGTH_DATA)?:0
-    }
-
-    private fun parsePhoneNumberCountryCode(arguments: Bundle?): String? {
-        return arguments?.getString(PHONE_NUMBER_COUNTRY_CODE)
-    }
-
-    private fun parsePhoneNumber(arguments: Bundle?): String? {
-        return arguments?.getString(PHONE_NUMBER)
-    }
-
-    private fun parsePhoneNumberFormatted(arguments: Bundle?): String? {
-        return arguments?.getString(PHONE_NUMBER_FORMATTED_DATA)
+    private fun parseAccountName(arguments: Bundle?): String? {
+        return arguments?.getString(ACCOUNT_NAME)
     }
 
     @Composable
     override fun Content(
-        viewModel: SignInOtpVerificationViewModel,
+        viewModel: SignInTimeBasedOtpVerificationViewModel,
         arguments: Bundle?,
         onCloseApp: () -> Unit
-    ) = SignInOtpVerificationScreen(viewModel = viewModel, otpLength = parseOtpLength(arguments), phoneNumberCountryCode = parsePhoneNumberCountryCode(arguments), phoneNumber = parsePhoneNumber(arguments), phoneNumberFormatted = parsePhoneNumberFormatted(arguments), onCloseApp = onCloseApp)
+    ) = SignInTimeBasedOtpVerificationScreen(viewModel = viewModel, accountName = parseAccountName(arguments), onCloseApp = onCloseApp)
 }
-
-
 
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 @Composable
-fun SignInOtpVerificationScreen(viewModel: SignInOtpVerificationViewModel, otpLength: Int, phoneNumberCountryCode: String?, phoneNumber: String?, phoneNumberFormatted: String?, onCloseApp: () -> Unit) {
+fun SignInTimeBasedOtpVerificationScreen(viewModel: SignInTimeBasedOtpVerificationViewModel, accountName: String?, onCloseApp: () -> Unit) {
 
-    LaunchedEffect(Unit) {
-        viewModel.setVerificationData(otpLength = otpLength, phoneNumberCountryCode = phoneNumberCountryCode, phoneNumber = phoneNumber, phoneNumberFormatted = phoneNumberFormatted)
-    }
 
     val otpTextFieldFocusRequester = FocusRequester()
     var autoFocusOtpTextField by remember { mutableStateOf(true) }
 
-    val tooManySMSRequestDialogState = rememberMaterialDialogState(initialValue = false)
     val noInternetConnectionDialogState = rememberMaterialDialogState(initialValue = false)
     val errorDialogState = rememberMaterialDialogState(initialValue = false)
     var errorMessage: String by remember { mutableStateOf("") }
@@ -127,7 +111,7 @@ fun SignInOtpVerificationScreen(viewModel: SignInOtpVerificationViewModel, otpLe
 
     uiState.systemDialogUiState?.consume {
         when (it) {
-            is SystemDialogUiState.ShowTooManySMSRequest -> tooManySMSRequestDialogState.show()
+            is SystemDialogUiState.ShowTooManySMSRequest -> Unit
             is SystemDialogUiState.ShowNoInternetConnection -> noInternetConnectionDialogState.show()
             is SystemDialogUiState.ShowError -> {
                 errorMessage = it.errorMessage
@@ -136,31 +120,19 @@ fun SignInOtpVerificationScreen(viewModel: SignInOtpVerificationViewModel, otpLe
         }
     }
 
-    SignInPhoneNumberOtpVerificationContent(
-        otpLength = uiState.otpLength,
-        otpFormattedPhoneNumber = uiState.otpPhoneNumberFormatted,
-        otp = uiState.otp,
+    SignInTimeBasedOtpVerificationContent(
+        accountName = accountName?:"",
+        timeBasedOtpLength = uiState.timeBasedOtpLength,
+        timeBasedOtp = uiState.timeBasedOtp,
         otpTextFieldFocusRequester = otpTextFieldFocusRequester,
-        buttonConfirmIsEnabled = uiState.otp.length == uiState.otpLength && !uiState.isButtonVerifyOtpLoading && !uiState.isButtonRequestNewOtpLoading,
-        buttonResendIsEnabled = viewModel.countDownTimerTime == 0 && !uiState.isButtonVerifyOtpLoading && !uiState.isButtonRequestNewOtpLoading,
-        buttonConfirmIsLoading = uiState.isButtonVerifyOtpLoading,
-        buttonResendIsLoading = uiState.isButtonRequestNewOtpLoading,
-        inputEnabled = !uiState.isButtonVerifyOtpLoading,
-        countDownTime = viewModel.countDownTimerTime,
-        confirmErrorResId = uiState.verifyOtpErrorMessage,
-        resendErrorResId = uiState.requestNewOtpErrorMessage,
-        showInvalidOtp = uiState.showInvalidOtp,
+        buttonConfirmIsEnabled = uiState.timeBasedOtp.length == uiState.timeBasedOtpLength && !uiState.isButtonVerifyTimeBasedOtpLoading,
+        buttonConfirmIsLoading = uiState.isButtonVerifyTimeBasedOtpLoading,
+        inputEnabled = !uiState.isButtonVerifyTimeBasedOtpLoading,
+        confirmErrorResId = uiState.verifyTimeBasedOtpErrorMessage,
+        showInvalidOtp = uiState.showInvalidTimeBasedOtp,
         onBack = { viewModel.navigateToRoute(SignInRequestOtpNav.route) },
-        onOtpChange = { viewModel.setOtp(it) },
-        onConfirmClick = { viewModel.verifyOtp() },
-        onResendClick = { viewModel.requestNewOtp() }
-    )
-
-    TooManySMSRequestDialog(
-        dialogState = tooManySMSRequestDialogState,
-        onClose = {
-            tooManySMSRequestDialogState.takeIf { it.showing }?.hide()
-        }
+        onOtpChange = { viewModel.setTimeBasedOtp(it) },
+        onConfirmClick = { viewModel.verifyTimeBasedOtp() },
     )
 
     NoInternetConnectionDialog(
@@ -197,24 +169,19 @@ fun SignInOtpVerificationScreen(viewModel: SignInOtpVerificationViewModel, otpLe
 
 @ExperimentalAnimationApi
 @Composable
-fun SignInPhoneNumberOtpVerificationContent(
-    otpLength: Int,
-    otpFormattedPhoneNumber: String,
-    otp: String,
+fun SignInTimeBasedOtpVerificationContent(
+    accountName: String,
+    timeBasedOtpLength: Int,
+    timeBasedOtp: String,
     otpTextFieldFocusRequester: FocusRequester,
     buttonConfirmIsLoading: Boolean,
-    buttonResendIsLoading: Boolean,
     buttonConfirmIsEnabled: Boolean,
-    buttonResendIsEnabled: Boolean,
     inputEnabled: Boolean,
-    countDownTime: Int,
     showInvalidOtp: Boolean,
     @StringRes confirmErrorResId: Int?,
-    @StringRes resendErrorResId: Int?,
     onBack: () -> Unit,
     onConfirmClick: () -> Unit,
-    onOtpChange: (newOtp: String) -> Unit,
-    onResendClick: () -> Unit
+    onOtpChange: (newTimeBasedOtp: String) -> Unit
 ) {
     var cancelIconVisible by remember { mutableStateOf(false) }
 
@@ -231,17 +198,11 @@ fun SignInPhoneNumberOtpVerificationContent(
             ScreenTitleWithBackButtonIcon(
                 modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
                 title = stringResource(
-                    id = R.string.sign_in_phone_number_otp_verification_screen_title,
-                    (otpLength.takeIf { it > 0 } ?: "")
+                    id = R.string.sign_in_time_based_otp_verification_screen_title, accountName
                 ),
                 onClose = {
                     onBack()
                 }
-            )
-            Text(
-                modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
-                style = MaterialTheme.typography.body1,
-                text = otpFormattedPhoneNumber
             )
             Spacer(Modifier.height(24.dp))
             OutlinedTextField(
@@ -249,9 +210,9 @@ fun SignInPhoneNumberOtpVerificationContent(
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .focusRequester(otpTextFieldFocusRequester),
-                value = otp,
+                value = timeBasedOtp,
                 onValueChange = {
-                    if (it.isDigitsOnly() && (otpLength == 0 || it.length <= otpLength)) {
+                    if (it.isDigitsOnly() && (timeBasedOtpLength == 0 || it.length <= timeBasedOtpLength)) {
                         onOtpChange(it)
                     }
                     cancelIconVisible = it.isNotEmpty()
@@ -305,66 +266,6 @@ fun SignInPhoneNumberOtpVerificationContent(
             )
             ShowErrorText(errorResId = confirmErrorResId)
             Spacer(Modifier.height(24.dp))
-            ButtonResendCode(
-                textResId = R.string.button_resend_code,
-                isEnabled = buttonResendIsEnabled,
-                isLoading = buttonResendIsLoading,
-                countDownTime = countDownTime,
-                onButtonClick = onResendClick,
-                Modifier.align(alignment = Alignment.CenterHorizontally)
-            )
-            ShowErrorText(errorResId = resendErrorResId)
-        }
-    }
-}
-
-@Composable
-fun ButtonResendCode(
-    @StringRes textResId: Int,
-    isEnabled: Boolean,
-    isLoading: Boolean,
-    countDownTime: Int,
-    onButtonClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    TextButton(
-        modifier = modifier.padding(start = 24.dp),
-        onClick = { if (!isLoading) onButtonClick() },
-        enabled = isEnabled && countDownTime == 0
-    ) {
-        Column {
-            when (countDownTime > 0) {
-                true -> {
-                    Box(modifier = Modifier.align(alignment = Alignment.End)) {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .align(alignment = Alignment.Center),
-                            strokeWidth = 1.dp
-                        )
-                        Text(
-                            text = countDownTime.toString(),
-                            style = MaterialTheme.typography.caption,
-                            color = MaterialTheme.colors.primary,
-                            modifier = Modifier.align(alignment = Alignment.Center)
-                        )
-                    }
-                }
-                false -> {
-                    Spacer(Modifier.height(24.dp))
-                }
-            }
-            when (isLoading) {
-                true -> CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colors.primary,
-                    strokeWidth = 2.dp
-                )
-                false -> Text(
-                    text = stringResource(id = textResId),
-                    modifier = Modifier.padding(end = 24.dp)
-                )
-            }
         }
     }
 }

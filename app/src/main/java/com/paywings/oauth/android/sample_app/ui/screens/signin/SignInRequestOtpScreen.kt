@@ -27,6 +27,7 @@ import com.paywings.oauth.android.sample_app.ui.screens.dialogs.country.CountryS
 import com.paywings.oauth.android.sample_app.ui.screens.dialogs.system.ErrorDialog
 import com.paywings.oauth.android.sample_app.ui.screens.dialogs.system.NoInternetConnectionDialog
 import com.paywings.oauth.android.sample_app.ui.screens.dialogs.system.SystemDialogUiState
+import com.paywings.oauth.android.sample_app.ui.screens.dialogs.system.TooManySMSRequestDialog
 import com.paywings.oauth.android.sample_app.util.consume
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 
@@ -62,6 +63,7 @@ fun SignInRequestOtpScreen(viewModel: SignInRequestOtpViewModel, onCloseApp: () 
     var autoFocusPhoneNumberInputTextField by remember { mutableStateOf(true) }
 
     val countrySelectDialogState = rememberMaterialDialogState(initialValue = false)
+    val tooManySMSRequestDialogState = rememberMaterialDialogState(initialValue = false)
     val noInternetConnectionDialogState = rememberMaterialDialogState(initialValue = false)
     val errorDialogState = rememberMaterialDialogState(initialValue = false)
     var errorMessage: String by remember { mutableStateOf("") }
@@ -70,6 +72,7 @@ fun SignInRequestOtpScreen(viewModel: SignInRequestOtpViewModel, onCloseApp: () 
 
     uiState.systemDialogUiState?.consume {
         when (it) {
+            is SystemDialogUiState.ShowTooManySMSRequest -> tooManySMSRequestDialogState.show()
             is SystemDialogUiState.ShowNoInternetConnection -> noInternetConnectionDialogState.show()
             is SystemDialogUiState.ShowError -> {
                 errorMessage = it.errorMessage
@@ -112,6 +115,13 @@ fun SignInRequestOtpScreen(viewModel: SignInRequestOtpViewModel, onCloseApp: () 
         onClose = {
             countrySelectDialogState.takeIf { it.showing }?.hide()
             autoFocusPhoneNumberInputTextField = true
+        }
+    )
+
+    TooManySMSRequestDialog(
+        dialogState = tooManySMSRequestDialogState,
+        onClose = {
+            tooManySMSRequestDialogState.takeIf { it.showing }?.hide()
         }
     )
 

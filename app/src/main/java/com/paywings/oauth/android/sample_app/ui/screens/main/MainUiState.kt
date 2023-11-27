@@ -9,6 +9,7 @@ data class MainUiState(
     val lastName: String = "",
     val email: String = "",
     val phoneNumber: String = "",
+    val accessTokenExpirationDateTime: String = "",
     val systemDialogUiState: OneTimeEvent<SystemDialogUiState>? = null,
 )
 
@@ -18,6 +19,7 @@ fun MainUiState.updateState(
     lastName: String = this.lastName,
     email: String = this.email,
     phoneNumber: String = this.phoneNumber,
+    accessTokenExpirationDateTime: String = this.accessTokenExpirationDateTime,
     systemDialogUiState: OneTimeEvent<SystemDialogUiState>? = null,
 ) : MainUiState {
     return MainUiState(
@@ -26,6 +28,7 @@ fun MainUiState.updateState(
         lastName = lastName,
         email = email,
         phoneNumber = phoneNumber,
+        accessTokenExpirationDateTime = accessTokenExpirationDateTime,
         systemDialogUiState = systemDialogUiState
     )
 }

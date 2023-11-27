@@ -18,7 +18,6 @@ import com.paywings.oauth.android.sample_app.ui.screens.email_verification.Email
 import com.paywings.oauth.android.sample_app.ui.screens.main.MainNav
 import com.paywings.oauth.android.sample_app.ui.screens.user_registration.UserRegistrationNav
 import com.paywings.oauth.android.sample_app.util.Constants.DoNothing
-import com.paywings.oauth.android.sample_app.util.UserSession
 import com.paywings.oauth.android.sample_app.util.asOneTimeEvent
 import com.paywings.oauth.android.sdk.data.enums.OAuthErrorCode
 import com.paywings.oauth.android.sdk.initializer.PayWingsOAuthClient
@@ -34,13 +33,13 @@ import javax.inject.Inject
 class SignInOtpVerificationViewModel @Inject constructor(
     private val routeNavigator: RouteNavigator,
     private val networkState: NetworkState,
-    private val userSession: UserSession
 ): ViewModel(), RouteNavigator by routeNavigator {
 
     var uiState: SignInOtpVerificationUiState by mutableStateOf(value = SignInOtpVerificationUiState())
     var countDownTimerTime: Int by mutableStateOf(value = 0)
 
-    private var phoneNumberOAuth: String = ""
+    private var phoneNumberCountryCode: String = ""
+    private var phoneNumber: String = ""
     private var isVerifyOtpLastAction: Boolean? = null
 
     private val countDownTimer = object: CountDownTimer(
@@ -64,9 +63,10 @@ class SignInOtpVerificationViewModel @Inject constructor(
         startOtpResendTimer()
     }
 
-    fun setVerificationData(otpLength: Int, phoneNumberOAuth: String?, phoneNumberFormatted: String?) {
-        if (otpLength > 0 && !phoneNumberOAuth.isNullOrBlank() && !phoneNumberFormatted.isNullOrBlank()) {
-            this.phoneNumberOAuth = phoneNumberOAuth
+    fun setVerificationData(otpLength: Int, phoneNumberCountryCode: String?, phoneNumber: String?, phoneNumberFormatted: String?) {
+        if (otpLength > 0 && !phoneNumberCountryCode.isNullOrBlank() && !phoneNumber.isNullOrBlank() && !phoneNumberFormatted.isNullOrBlank()) {
+            this.phoneNumberCountryCode = phoneNumberCountryCode
+            this.phoneNumber = phoneNumber
             uiState = uiState.updateState(otpLength = otpLength, otpPhoneNumberFormatted = phoneNumberFormatted)
         } else {
             navigateToRoute(OAUTH_ROUTE)
@@ -105,12 +105,15 @@ class SignInOtpVerificationViewModel @Inject constructor(
             navigateToRoute(UserRegistrationNav.route)
         }
 
-        override fun onSignInSuccessful(
-            refreshToken: String,
-            accessToken: String,
-            accessTokenExpirationTime: Long
-        ) {
-            userSession.signInUser(refreshToken = refreshToken, accessToken = accessToken, accessTokenExpirationTime = accessTokenExpirationTime)
+        override fun onShowTimeBasedOtpSetupScreen(accountName: String, secretKey: String) {
+            navigateToRoute(SignInTimeBasedOtpSetupScreenNav.routeWithArguments(accountName = accountName, secretKey = secretKey))
+        }
+
+        override fun onShowTimeBasedOtpVerificationInputScreen(accountName: String) {
+            navigateToRoute(SignInTimeBasedOtpVerificationNav.routeWithArguments(accountName))
+        }
+
+        override fun onSignInSuccessful() {
             navigateToRoute(MainNav.route)
         }
 
@@ -128,7 +131,8 @@ class SignInOtpVerificationViewModel @Inject constructor(
         uiState = uiState.updateState(isButtonRequestNewOtpLoading = true)
         viewModelScope.launch {
             PayWingsOAuthClient.instance.signInWithPhoneNumberRequestOtp(
-                phoneNumber = phoneNumberOAuth,
+                phoneNumberCountryCode = phoneNumberCountryCode,
+                phoneNumber = phoneNumber,
                 callback = signInWithPhoneNumberRequestOtp
             )
         }
@@ -146,6 +150,10 @@ class SignInOtpVerificationViewModel @Inject constructor(
         override fun onShowOtpInputScreen(otpLength: Int) {
             startOtpResendTimer()
             uiState = uiState.updateState()
+        }
+
+        override fun onShowTimeBasedOtpVerificationInputScreen(accountName: String) {
+            navigateToRoute(SignInTimeBasedOtpVerificationNav.routeWithArguments(accountName))
         }
     }
 

@@ -60,6 +60,7 @@ fun MainScreen(viewModel: MainViewModel, onCloseApp: () -> Unit) {
 
     uiState.systemDialogUiState?.consume {
         when (it) {
+            is SystemDialogUiState.ShowTooManySMSRequest -> Unit
             is SystemDialogUiState.ShowNoInternetConnection -> noInternetConnectionDialogState.show()
             is SystemDialogUiState.ShowError -> {
                 errorMessage = it.errorMessage
@@ -74,6 +75,8 @@ fun MainScreen(viewModel: MainViewModel, onCloseApp: () -> Unit) {
         lastName = uiState.lastName,
         emailAddress = uiState.email,
         phoneNumber = uiState.phoneNumber,
+        accessTokenExpirationDateTime = uiState.accessTokenExpirationDateTime,
+        onGetValidAccessToken = { viewModel.getNewAuthorizationData() },
         onSignOut = { viewModel.signOutUser() }
     )
 
@@ -113,6 +116,8 @@ fun MainContent(
     lastName: String,
     emailAddress: String,
     phoneNumber: String,
+    accessTokenExpirationDateTime: String,
+    onGetValidAccessToken: () -> Unit,
     onSignOut: () -> Unit
 ) {
 
@@ -135,6 +140,12 @@ fun MainContent(
         Text(text = stringResource(id = R.string.main_screen_email, emailAddress))
         Spacer(Modifier.height(8.dp))
         Text(text = stringResource(id = R.string.main_screen_phone_number, phoneNumber))
+        Spacer(Modifier.height(16.dp))
+        Text(text = stringResource(id = R.string.main_screen_access_token_expiration_time, accessTokenExpirationDateTime))
+        Button(onClick = onGetValidAccessToken) {
+            Text(text = stringResource(id = R.string.button_get_valid_access_token))
+        }
+
         Spacer(Modifier.height(24.dp))
         Button(modifier = Modifier.align(Alignment.End), onClick = { onSignOut() }) {
             Text(text = stringResource(id = R.string.button_sign_out))

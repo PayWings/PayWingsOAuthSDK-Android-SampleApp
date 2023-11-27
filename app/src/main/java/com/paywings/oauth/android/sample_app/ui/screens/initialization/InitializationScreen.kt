@@ -19,7 +19,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.paywings.oauth.android.sample_app.R
 import com.paywings.oauth.android.sample_app.ui.nav.NavRoute
 import com.paywings.oauth.android.sample_app.ui.screens.dialogs.system.ErrorDialog
-import com.paywings.oauth.android.sample_app.ui.screens.dialogs.system.NoInternetConnectionDialog
 import com.paywings.oauth.android.sample_app.ui.screens.dialogs.system.SystemDialogUiState
 import com.paywings.oauth.android.sample_app.util.consume
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
@@ -60,6 +59,7 @@ fun InitializationScreen(viewModel: InitializationViewModel, onCloseApp: () -> U
 
     uiState.systemDialogUiState?.consume {
         when (it) {
+            is SystemDialogUiState.ShowTooManySMSRequest -> Unit
             is SystemDialogUiState.ShowNoInternetConnection -> noInternetConnectionDialogState.show()
             is SystemDialogUiState.ShowError -> {
                 errorMessage = it.errorMessage
@@ -70,19 +70,6 @@ fun InitializationScreen(viewModel: InitializationViewModel, onCloseApp: () -> U
 
     InitializationContent()
 
-    NoInternetConnectionDialog(
-        dialogState = noInternetConnectionDialogState,
-        cancelButtonNameResId = R.string.button_exit,
-        onRecheckInternetConnection = {
-            noInternetConnectionDialogState.takeIf { it.showing }?.hide()
-            viewModel.recheckInternetConnection()
-        },
-        onCancel = {
-            noInternetConnectionDialogState.takeIf { it.showing }?.hide()
-            onCloseApp()
-        }
-    )
-
     ErrorDialog(
         dialogState = errorDialogState,
         detailedMessage = errorMessage,
@@ -91,10 +78,6 @@ fun InitializationScreen(viewModel: InitializationViewModel, onCloseApp: () -> U
             onCloseApp()
         }
     )
-
-    LaunchedEffect(Unit) {
-        viewModel.initialization()
-    }
 
     BackHandler(enabled = true, onBack = { onCloseApp() })
 }

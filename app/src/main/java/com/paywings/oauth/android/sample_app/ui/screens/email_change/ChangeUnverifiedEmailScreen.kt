@@ -102,6 +102,7 @@ fun ChangeUnverifiedEmailScreen(viewModel: ChangeUnverifiedEmailViewModel, previ
 
     uiState.systemDialogUiState?.consume {
         when (it) {
+            is SystemDialogUiState.ShowTooManySMSRequest -> Unit
             is SystemDialogUiState.ShowNoInternetConnection -> noInternetConnectionDialogState.show()
             is SystemDialogUiState.ShowError -> {
                 errorMessage = it.errorMessage

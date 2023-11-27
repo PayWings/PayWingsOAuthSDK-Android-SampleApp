@@ -38,7 +38,8 @@ class SignInRequestOtpViewModel @Inject constructor(
         setSelectedCountry(uiState.selectedCountry)
     }
 
-    private var phoneNumberOAuth: String = ""
+    private var phoneNumberCountryCode: String = ""
+    private var phoneNumber: String = ""
 
     fun setMobileNumber(newPhoneNumber: String) {
         uiState = uiState.updateState(phoneNumber = newPhoneNumber, isPhoneNumberValid = phoneNumberUtilHelper.isPhoneNumberValid(phoneNumber = newPhoneNumber, country = uiState.selectedCountry))
@@ -70,21 +71,22 @@ class SignInRequestOtpViewModel @Inject constructor(
     }
 
     fun requestOtpSend() {
-        phoneNumberUtilHelper.convertToOAuthFormat(phoneNumber = uiState.phoneNumber, country = uiState.selectedCountry)?.takeIf { it.isNotBlank() }?.let { phoneNumber ->
-            uiState = uiState.updateState(isLoading = true)
-            phoneNumberOAuth = phoneNumber
-            viewModelScope.launch {
-                PayWingsOAuthClient.instance.signInWithPhoneNumberRequestOtp(
-                    phoneNumber = phoneNumber,
-                    callback = signInWithPhoneNumberRequestOtp
-                )
-            }
+        uiState = uiState.updateState(isLoading = true)
+        phoneNumber = phoneNumberUtilHelper.normalizeDigitsOnly(uiState.phoneNumber)?:""
+        phoneNumberCountryCode = uiState.selectedCountry.phoneCode
+        viewModelScope.launch {
+            PayWingsOAuthClient.instance.signInWithPhoneNumberRequestOtp(
+                phoneNumberCountryCode = phoneNumberCountryCode,
+                phoneNumber = phoneNumber,
+                callback = signInWithPhoneNumberRequestOtp
+            )
         }
     }
 
     private val signInWithPhoneNumberRequestOtp = object: SignInWithPhoneNumberRequestOtpCallback {
         override fun onError(error: OAuthErrorCode, errorMessage: String?) {
             uiState = when(error) {
+                OAuthErrorCode.TOO_MANY_REQUESTS_FOR_SMS_SEND -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowTooManySMSRequest.asOneTimeEvent())
                 OAuthErrorCode.NO_INTERNET -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
                 OAuthErrorCode.INVALID_PHONE_NUMBER -> uiState.updateState(errorMessageResId = R.string.sign_in_request_otp_screen_error_invalid_phone_number)
                 OAuthErrorCode.USER_IS_SUSPENDED -> uiState.updateState(errorMessageResId = R.string.sign_in_request_otp_screen_error_phone_number_suspended)
@@ -93,7 +95,11 @@ class SignInRequestOtpViewModel @Inject constructor(
         }
 
         override fun onShowOtpInputScreen(otpLength: Int) {
-            navigateToRoute(SignInOtpVerificationNav.routeWithArguments(otpLength = otpLength, phoneNumberOAuth = phoneNumberOAuth, phoneNumberFormatted = phoneNumberUtilHelper.convertToUserDisplayFormat(phoneNumber = uiState.phoneNumber, country = uiState.selectedCountry)?:""))
+            navigateToRoute(SignInOtpVerificationNav.routeWithArguments(otpLength = otpLength, phoneNumberCountryCode = phoneNumberCountryCode, phoneNumber = phoneNumber, phoneNumberFormatted = phoneNumberUtilHelper.convertToUserDisplayFormat(phoneNumber = uiState.phoneNumber, country = uiState.selectedCountry)?:""))
+        }
+
+        override fun onShowTimeBasedOtpVerificationInputScreen(accountName: String) {
+            navigateToRoute(SignInTimeBasedOtpVerificationNav.routeWithArguments(accountName))
         }
     }
 

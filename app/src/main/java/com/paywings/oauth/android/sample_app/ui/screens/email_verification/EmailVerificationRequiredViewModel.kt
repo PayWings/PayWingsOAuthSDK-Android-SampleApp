@@ -1,6 +1,5 @@
 package com.paywings.oauth.android.sample_app.ui.screens.email_verification
 
-import androidx.annotation.DoNotInline
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,16 +7,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.paywings.oauth.android.sample_app.R
 import com.paywings.oauth.android.sample_app.data.remote.NetworkConstants
 import com.paywings.oauth.android.sample_app.network.NetworkState
 import com.paywings.oauth.android.sample_app.ui.nav.RouteNavigator
 import com.paywings.oauth.android.sample_app.ui.nav.graph.OAUTH_ROUTE
 import com.paywings.oauth.android.sample_app.ui.screens.dialogs.system.SystemDialogUiState
-import com.paywings.oauth.android.sample_app.ui.screens.email_change.updateState
 import com.paywings.oauth.android.sample_app.ui.screens.main.MainNav
 import com.paywings.oauth.android.sample_app.util.Constants.DoNothing
-import com.paywings.oauth.android.sample_app.util.UserSession
 import com.paywings.oauth.android.sample_app.util.asOneTimeEvent
 import com.paywings.oauth.android.sdk.data.enums.OAuthErrorCode
 import com.paywings.oauth.android.sdk.initializer.PayWingsOAuthClient
@@ -34,7 +30,6 @@ import javax.inject.Inject
 class EmailVerificationRequiredViewModel @Inject constructor(
     private val routeNavigator: RouteNavigator,
     private val networkState: NetworkState,
-    private val userSession: UserSession
 ): ViewModel(), RouteNavigator by routeNavigator {
 
     var uiState: EmailConfirmationRequiredUiState by mutableStateOf(value = EmailConfirmationRequiredUiState())
@@ -51,9 +46,9 @@ class EmailVerificationRequiredViewModel @Inject constructor(
         uiState = uiState.updateState(emailVerificationRunning = false)
     }
 
-    private fun checkEmailVerified() {
+    fun checkEmailVerified() {
         isCheckEmailVerifiedLastAction = true
-        viewModelScope.launch() {
+        viewModelScope.launch {
             PayWingsOAuthClient.instance.checkEmailVerified(callback = checkEmailVerifiedCallback)
         }
     }
@@ -75,12 +70,7 @@ class EmailVerificationRequiredViewModel @Inject constructor(
             }
         }
 
-        override fun onSignInSuccessful(
-            refreshToken: String,
-            accessToken: String,
-            accessTokenExpirationTime: Long
-        ) {
-            userSession.signInUser(refreshToken = refreshToken, accessToken = accessToken, accessTokenExpirationTime = accessTokenExpirationTime)
+        override fun onSignInSuccessful() {
             navigateToRoute(MainNav.route)
         }
 

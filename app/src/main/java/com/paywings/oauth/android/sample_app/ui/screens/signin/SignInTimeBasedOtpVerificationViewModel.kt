@@ -1,4 +1,4 @@
-package com.paywings.oauth.android.sample_app.ui.screens.user_registration
+package com.paywings.oauth.android.sample_app.ui.screens.signin
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.getValue
@@ -10,14 +10,14 @@ import androidx.lifecycle.viewModelScope
 import com.paywings.oauth.android.sample_app.R
 import com.paywings.oauth.android.sample_app.network.NetworkState
 import com.paywings.oauth.android.sample_app.ui.nav.RouteNavigator
-import com.paywings.oauth.android.sample_app.ui.nav.graph.OAUTH_ROUTE
 import com.paywings.oauth.android.sample_app.ui.screens.dialogs.system.SystemDialogUiState
 import com.paywings.oauth.android.sample_app.ui.screens.email_verification.EmailVerificationRequiredNav
 import com.paywings.oauth.android.sample_app.ui.screens.main.MainNav
+import com.paywings.oauth.android.sample_app.ui.screens.user_registration.UserRegistrationNav
 import com.paywings.oauth.android.sample_app.util.asOneTimeEvent
 import com.paywings.oauth.android.sdk.data.enums.OAuthErrorCode
 import com.paywings.oauth.android.sdk.initializer.PayWingsOAuthClient
-import com.paywings.oauth.android.sdk.service.callback.RegisterUserCallback
+import com.paywings.oauth.android.sdk.service.callback.SignInWithPhoneTimeBasedOTPVerificationCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,43 +25,33 @@ import javax.inject.Inject
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 @HiltViewModel
-class UserRegistrationViewModel @Inject constructor(
+class SignInTimeBasedOtpVerificationViewModel @Inject constructor(
     private val routeNavigator: RouteNavigator,
-    private val networkState: NetworkState,
+    private val networkState: NetworkState
 ): ViewModel(), RouteNavigator by routeNavigator {
 
-    var uiState: UserRegistrationUiState by mutableStateOf(value = UserRegistrationUiState())
+    var uiState: SignInTimeBasedOtpVerificationUiState by mutableStateOf(value = SignInTimeBasedOtpVerificationUiState())
 
-    fun setFirstName(firstName: String) {
-        uiState = uiState.updateState(firstName = firstName)
+    fun setTimeBasedOtp(newTimeBasedOtp: String) {
+        uiState = uiState.updateState(timeBasedOtp = newTimeBasedOtp)
     }
 
-    fun setLastName(lastName: String) {
-        uiState = uiState.updateState(lastName = lastName)
-    }
-
-    fun setEmail(email: String) {
-        uiState = uiState.updateState(email = email)
-    }
-
-    fun registerUser() {
-        uiState = uiState.updateState(isLoading = true)
+    fun verifyTimeBasedOtp() {
+        uiState = uiState.updateState(isButtonVerifyTimeBasedOtpLoading = true)
         viewModelScope.launch {
-            PayWingsOAuthClient.instance.registerUser(
-                firstName = uiState.firstName,
-                lastName = uiState.lastName,
-                email = uiState.email,
-                callback = registerUserCallback
+            PayWingsOAuthClient.instance.signInWithPhoneTimeBasedOTPVerification(
+                timeBasedOtp = uiState.timeBasedOtp,
+                callback = signInWithPhoneTimeBasedOTPVerificationCallback
             )
         }
     }
 
-    private val registerUserCallback = object: RegisterUserCallback {
+    private val signInWithPhoneTimeBasedOTPVerificationCallback = object :
+        SignInWithPhoneTimeBasedOTPVerificationCallback {
         override fun onError(error: OAuthErrorCode, errorMessage: String?) {
             uiState = when(error) {
                 OAuthErrorCode.NO_INTERNET -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
-                OAuthErrorCode.USER_IS_SUSPENDED -> uiState.updateState(errorMessageResId = R.string.sign_in_request_otp_screen_error_phone_number_suspended)
-                OAuthErrorCode.INVALID_EMAIL -> uiState.updateState(emailErrorMessage = R.string.user_registration_screen_error_invalid_email)
+                OAuthErrorCode.USER_IS_SUSPENDED -> uiState.updateState(verifyTimeBasedOtpErrorMessage = R.string.sign_in_request_otp_screen_error_invalid_phone_number)
                 else -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowError(errorMessage = error.description).asOneTimeEvent())
             }
         }
@@ -70,21 +60,27 @@ class UserRegistrationViewModel @Inject constructor(
             navigateToRoute(EmailVerificationRequiredNav.routeWithArguments(email = email, autoEmailSent = autoEmailSent))
         }
 
+        override fun onShowRegistrationScreen() {
+            navigateToRoute(UserRegistrationNav.route)
+        }
+
         override fun onSignInSuccessful() {
-             navigateToRoute(MainNav.route)
+            navigateToRoute(MainNav.route)
         }
 
         override fun onUserSignInRequired() {
-            navigateToRoute(OAUTH_ROUTE)
+            navigateToRoute(SignInRequestOtpNav.route)
         }
 
+        override fun onVerificationFailed() {
+            uiState = uiState.updateState(showInvalidTimeBasedOtp = true)
+        }
     }
 
     fun recheckInternetConnection() {
         when (networkState.isConnected) {
-            true -> registerUser()
-            false -> uiState =
-                uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
+            true -> verifyTimeBasedOtp()
+            false -> uiState =uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
         }
     }
 }
