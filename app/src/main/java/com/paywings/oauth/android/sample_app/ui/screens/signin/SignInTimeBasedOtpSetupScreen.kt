@@ -83,14 +83,14 @@ object SignInTimeBasedOtpSetupScreenNav : NavRoute<SignInTimeBasedOtpSetupViewMo
         viewModel: SignInTimeBasedOtpSetupViewModel,
         arguments: Bundle?,
         onCloseApp: () -> Unit
-    ) = SignInTimeBasedOtpSetupScreen(viewModel = viewModel, accountName = parseAccountName(arguments)?:"", secretKey = parseSecretKey(arguments)?:"", onCloseApp = onCloseApp)
+    ) = SignInTimeBasedOtpSetupScreen(viewModel = viewModel, accountName = parseAccountName(arguments)?:"", secretKey = parseSecretKey(arguments)?:"")
 }
 
 
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 @Composable
-fun SignInTimeBasedOtpSetupScreen(viewModel: SignInTimeBasedOtpSetupViewModel, accountName: String, secretKey: String, onCloseApp: () -> Unit) {
+fun SignInTimeBasedOtpSetupScreen(viewModel: SignInTimeBasedOtpSetupViewModel, accountName: String, secretKey: String) {
 
     SignInTimeBasedOtpSetupContent(
         accountName = accountName,

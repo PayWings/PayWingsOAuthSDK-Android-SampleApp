@@ -59,7 +59,7 @@ class UserRegistrationViewModel @Inject constructor(
     private val registerUserCallback = object: RegisterUserCallback {
         override fun onError(error: OAuthErrorCode, errorMessage: String?) {
             uiState = when(error) {
-                OAuthErrorCode.NO_INTERNET -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
+                OAuthErrorCode.INTERNET_CONNECTION_ISSUE -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
                 OAuthErrorCode.USER_IS_SUSPENDED -> uiState.updateState(errorMessageResId = R.string.sign_in_request_otp_screen_error_phone_number_suspended)
                 OAuthErrorCode.INVALID_EMAIL -> uiState.updateState(emailErrorMessage = R.string.user_registration_screen_error_invalid_email)
                 else -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowError(errorMessage = error.description).asOneTimeEvent())

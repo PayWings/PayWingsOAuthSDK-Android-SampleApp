@@ -87,7 +87,7 @@ class SignInRequestOtpViewModel @Inject constructor(
         override fun onError(error: OAuthErrorCode, errorMessage: String?) {
             uiState = when(error) {
                 OAuthErrorCode.TOO_MANY_REQUESTS_FOR_SMS_SEND -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowTooManySMSRequest.asOneTimeEvent())
-                OAuthErrorCode.NO_INTERNET -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
+                OAuthErrorCode.INTERNET_CONNECTION_ISSUE -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
                 OAuthErrorCode.INVALID_PHONE_NUMBER -> uiState.updateState(errorMessageResId = R.string.sign_in_request_otp_screen_error_invalid_phone_number)
                 OAuthErrorCode.USER_IS_SUSPENDED -> uiState.updateState(errorMessageResId = R.string.sign_in_request_otp_screen_error_phone_number_suspended)
                 else -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowError(errorMessage = error.description).asOneTimeEvent())

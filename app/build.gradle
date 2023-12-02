@@ -80,7 +80,7 @@ dependencies {
         exclude module: 'libphonenumber-android'
     }
     implementation 'io.github.vanpra.compose-material-dialogs:datetime:0.9.0'
-    implementation 'io.michaelrocks:libphonenumber-android:8.13.17'
+    implementation 'io.michaelrocks:libphonenumber-android:8.13.25'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

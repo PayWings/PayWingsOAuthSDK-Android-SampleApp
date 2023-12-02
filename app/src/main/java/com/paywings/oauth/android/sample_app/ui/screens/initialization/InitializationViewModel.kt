@@ -1,12 +1,14 @@
 package com.paywings.oauth.android.sample_app.ui.screens.initialization
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.paywings.oauth.android.sample_app.ui.nav.RouteNavigator
 import com.paywings.oauth.android.sample_app.ui.nav.graph.MAIN_ROUTE
 import com.paywings.oauth.android.sample_app.ui.nav.graph.OAUTH_ROUTE
@@ -17,6 +19,7 @@ import com.paywings.oauth.android.sdk.data.enums.OAuthErrorCode
 import com.paywings.oauth.android.sdk.initializer.OAuthInitializationCallback
 import com.paywings.oauth.android.sdk.initializer.PayWingsOAuthClient
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ExperimentalAnimationApi
@@ -26,6 +29,8 @@ class InitializationViewModel @Inject constructor(
     application: Application,
     private val routeNavigator: RouteNavigator
 ) : AndroidViewModel(application), RouteNavigator by routeNavigator {
+
+    private val passcode = "123456"
 
     private val context
         get() = getApplication<Application>()
@@ -46,7 +51,16 @@ class InitializationViewModel @Inject constructor(
 
         override fun onSuccess() {
             when(PayWingsOAuthClient.instance.isUserSignIn()){
-                true -> navigateToRoute(MAIN_ROUTE)
+                true -> {
+                    viewModelScope.launch {
+                        when (PayWingsOAuthClient.isSecuritySet) {
+                            true -> PayWingsOAuthClient.unlock(passcode+1, onError = { errorMessage -> Log.d("OAuth", errorMessage?:"")  })
+                            false -> PayWingsOAuthClient.setupSecurity(passcode)
+                        }
+                        navigateToRoute(MAIN_ROUTE)
+                    }
+
+                }
                 false -> navigateToRoute(OAUTH_ROUTE)
             }
         }

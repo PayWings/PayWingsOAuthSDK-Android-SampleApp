@@ -65,7 +65,7 @@ class EmailVerificationRequiredViewModel @Inject constructor(
 
         override fun onError(error: OAuthErrorCode, errorMessage: String?) {
             uiState = when(error) {
-                OAuthErrorCode.NO_INTERNET -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
+                OAuthErrorCode.INTERNET_CONNECTION_ISSUE -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
                 else -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowError(errorMessage = error.description).asOneTimeEvent())
             }
         }
@@ -90,7 +90,7 @@ class EmailVerificationRequiredViewModel @Inject constructor(
     private val sendNewVerificationEmailCallback = object : SendNewVerificationEmailCallback {
         override fun onError(error: OAuthErrorCode, errorMessage: String?) {
             uiState = when(error) {
-                OAuthErrorCode.NO_INTERNET -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
+                OAuthErrorCode.INTERNET_CONNECTION_ISSUE -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
                 else -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowError(errorMessage = error.description).asOneTimeEvent())
             }
         }

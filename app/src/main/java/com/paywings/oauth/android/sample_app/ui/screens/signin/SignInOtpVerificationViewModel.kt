@@ -91,7 +91,7 @@ class SignInOtpVerificationViewModel @Inject constructor(
     private val signInWithPhoneNumberVerifyOtpCallback = object : SignInWithPhoneNumberVerifyOtpCallback {
         override fun onError(error: OAuthErrorCode, errorMessage: String?) {
             uiState = when(error) {
-                OAuthErrorCode.NO_INTERNET -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
+                OAuthErrorCode.INTERNET_CONNECTION_ISSUE -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
                 OAuthErrorCode.USER_IS_SUSPENDED -> uiState.updateState(verifyOtpErrorMessage = R.string.sign_in_request_otp_screen_error_invalid_phone_number)
                 else -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowError(errorMessage = error.description).asOneTimeEvent())
             }
@@ -141,7 +141,7 @@ class SignInOtpVerificationViewModel @Inject constructor(
     private val signInWithPhoneNumberRequestOtp = object: SignInWithPhoneNumberRequestOtpCallback {
         override fun onError(error: OAuthErrorCode, errorMessage: String?) {
             uiState = when(error) {
-                OAuthErrorCode.NO_INTERNET -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
+                OAuthErrorCode.INTERNET_CONNECTION_ISSUE -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
                 OAuthErrorCode.USER_IS_SUSPENDED -> uiState.updateState(requestNewOtpErrorMessage = R.string.sign_in_request_otp_screen_error_phone_number_suspended)
                 else -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowError(errorMessage = error.description).asOneTimeEvent())
             }

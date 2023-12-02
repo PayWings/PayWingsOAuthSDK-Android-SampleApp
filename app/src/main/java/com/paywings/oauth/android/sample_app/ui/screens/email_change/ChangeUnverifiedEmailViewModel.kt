@@ -51,7 +51,7 @@ class ChangeUnverifiedEmailViewModel @Inject constructor(
     private val changeUnverifiedEmailCallback = object : ChangeUnverifiedEmailCallback {
         override fun onError(error: OAuthErrorCode, errorMessage: String?) {
             uiState = when(error) {
-                OAuthErrorCode.NO_INTERNET -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
+                OAuthErrorCode.INTERNET_CONNECTION_ISSUE -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowNoInternetConnection.asOneTimeEvent())
                 OAuthErrorCode.INVALID_EMAIL -> uiState.updateState(emailErrorMessage = R.string.user_registration_screen_error_invalid_email)
                 else -> uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowError(errorMessage = error.description).asOneTimeEvent())
             }
