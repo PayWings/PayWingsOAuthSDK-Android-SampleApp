@@ -91,6 +91,7 @@ interface NavRoute<T : RouteNavigator> {
             }
             is NavigationState.NavigateUp -> {
                 navHostController.navigateUp()
+                onNavigated(navigationState)
             }
             is NavigationState.Idle -> {
             }
