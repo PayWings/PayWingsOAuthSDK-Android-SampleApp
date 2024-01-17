@@ -32,8 +32,10 @@ class MainViewModel @Inject constructor(
     var uiState: MainUiState by mutableStateOf(value = MainUiState())
 
     fun signOutUser() {
-        PayWingsOAuthClient.instance.signOutUser()
-        navigateToRoute(OAUTH_ROUTE)
+        viewModelScope.launch {
+            PayWingsOAuthClient.instance.signOutUser()
+            navigateToRoute(OAUTH_ROUTE)
+        }
     }
 
     fun initialization() {

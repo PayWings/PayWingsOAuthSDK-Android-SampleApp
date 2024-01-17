@@ -50,18 +50,20 @@ class InitializationViewModel @Inject constructor(
         }
 
         override fun onSuccess() {
-            when(PayWingsOAuthClient.instance.isUserSignIn()){
-                true -> {
-                    viewModelScope.launch {
-                        when (PayWingsOAuthClient.isSecuritySet) {
-                            true -> PayWingsOAuthClient.unlock(passcode+1, onError = { errorMessage -> Log.d("OAuth", errorMessage?:"")  })
+            viewModelScope.launch {
+                when (PayWingsOAuthClient.instance.isUserSignIn()) {
+                    true -> {
+                        when (PayWingsOAuthClient.isSecuritySet()) {
+                            true -> PayWingsOAuthClient.unlock(
+                                passcode + 1,
+                                onError = { errorMessage -> Log.d("OAuth", errorMessage ?: "") })
+
                             false -> PayWingsOAuthClient.setupSecurity(passcode)
                         }
                         navigateToRoute(MAIN_ROUTE)
                     }
-
+                    false -> navigateToRoute(OAUTH_ROUTE)
                 }
-                false -> navigateToRoute(OAUTH_ROUTE)
             }
         }
     }
@@ -71,15 +73,17 @@ class InitializationViewModel @Inject constructor(
     }
 
     private fun oauthInitialization() {
-        PayWingsOAuthClient.init(
-            context = context,
-            environmentType = EnvironmentType.TEST,
-            apiKey = "fd724674-415d-42d7-b56c-fe3237c956d9",
-            domain = "paywings.io",
-            appPlatformID = "C9350E67-C251-4FCF-8B5F-01A865B36BAF",
-            recaptchaKey = "6LfsCKIoAAAAACh_ycSZx6wgAngWBEi9NHrU541j",
-            callback = oauthInitializationCallback
-        )
+        viewModelScope.launch {
+            PayWingsOAuthClient.init(
+                context = context,
+                environmentType = EnvironmentType.TEST,
+                apiKey = "fd724674-415d-42d7-b56c-fe3237c956d9",
+                domain = "paywings.io",
+                appPlatformID = "C9350E67-C251-4FCF-8B5F-01A865B36BAF",
+                recaptchaKey = "6LfsCKIoAAAAACh_ycSZx6wgAngWBEi9NHrU541j",
+                callback = oauthInitializationCallback
+            )
+        }
     }
 }
 
