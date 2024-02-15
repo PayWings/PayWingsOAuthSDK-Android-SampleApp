@@ -30,14 +30,17 @@ class InitializationViewModel @Inject constructor(
     private val routeNavigator: RouteNavigator
 ) : AndroidViewModel(application), RouteNavigator by routeNavigator {
 
-    private val passcode = "123456"
-
     private val context
         get() = getApplication<Application>()
 
     var uiState: InitializationUiState by mutableStateOf(value = InitializationUiState())
 
     var oauthInitializationRetryCount: Int = 0
+
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!! Option 1. Refresh Token is additionally encrypted before being stored inside secure storage and cannot be used without a passcode.
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    private val passcode = "123456"
 
     private val oauthInitializationCallback = object: OAuthInitializationCallback {
         override fun onFailure(error: OAuthErrorCode, errorMessage: String?) {
@@ -67,6 +70,37 @@ class InitializationViewModel @Inject constructor(
             }
         }
     }
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!! Option 2. Refresh Token is stored in plain text inside secure storage.
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    /*
+    private val oauthInitializationCallback = object: OAuthInitializationCallback {
+        override fun onFailure(error: OAuthErrorCode, errorMessage: String?) {
+            if (oauthInitializationRetryCount < 2) {
+                oauthInitializationRetryCount++
+                oauthInitialization()
+            } else {
+                uiState = uiState.updateState(systemDialogUiState = SystemDialogUiState.ShowError(errorMessage = errorMessage?:"").asOneTimeEvent())
+            }
+        }
+
+        override fun onSuccess() {
+            viewModelScope.launch {
+                when (PayWingsOAuthClient.instance.isUserSignIn()) {
+                    true -> navigateToRoute(MAIN_ROUTE)
+                    false -> navigateToRoute(OAUTH_ROUTE)
+                }
+            }
+        }
+    }
+     */
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
     init {
         oauthInitialization()
